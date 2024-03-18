@@ -22,12 +22,13 @@ public class FixedLengthDecoder  extends ByteToMessageDecoder {
         // 读取可读字节数
         int readableBytes = in.readableBytes();
 
-        // 如果可读字节数小于 4，则返回
-        if (readableBytes < 5) {
+        // 如果可读字节数小于信息头长度，则返回
+        if (readableBytes < Protocol.HEAD_SIZE) {
             return;
         }
 
         byte type = in.readByte();
+        int ID = in.readInt();
         int length = in.readInt();
 
         // 如果可读字节数小于消息长度，则返回
@@ -40,9 +41,13 @@ public class FixedLengthDecoder  extends ByteToMessageDecoder {
         byte[] bytes = new byte[length];
         in.readBytes(bytes);
         if (type == Protocol.REQUEST_TYPE) {
-            out.add(KryoSerializer.deserialize(bytes, RpcRequest.class));
+            RpcRequest deserialize = KryoSerializer.deserialize(bytes, RpcRequest.class);
+            deserialize.setID(ID);
+            out.add(deserialize);
         } else {
-            out.add(KryoSerializer.deserialize(bytes, RpcResponse.class));
+            RpcResponse deserialize = KryoSerializer.deserialize(bytes, RpcResponse.class);
+            deserialize.setID(ID);
+            out.add(deserialize);
         }
     }
 }

@@ -1,21 +1,23 @@
 package com.rpcdemo.netty.codec;
 
 import com.rpcdemo.common.Protocol;
+import com.rpcdemo.netty.dto.RpcMessage;
 import com.rpcdemo.netty.dto.RpcRequest;
 import com.rpcdemo.netty.serialize.KryoSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-public class FixedLengthEncode extends MessageToByteEncoder<RpcRequest> {
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class FixedLengthEncode extends MessageToByteEncoder<RpcMessage> {
+    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(0);
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, RpcRequest rpcRequest, ByteBuf byteBuf) throws Exception {
-        byte[] serialize = KryoSerializer.serialize(rpcRequest);
-        // 消息类型为Request
-        byteBuf.writeByte(KryoSerializer.REQUEST);
-        // 消息长度
+    protected void encode(ChannelHandlerContext channelHandlerContext, RpcMessage rpcMessage, ByteBuf byteBuf) throws Exception {
+        byte[] serialize = KryoSerializer.serialize(rpcMessage.getData());
+        byteBuf.writeByte(rpcMessage.getType());
+        byteBuf.writeInt(rpcMessage.getID());
         byteBuf.writeInt(serialize.length + Protocol.HEAD_SIZE);
-        // 消息正文
         byteBuf.writeBytes(serialize);
     }
 }
