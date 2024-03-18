@@ -2,6 +2,7 @@ package com.rpcdemo.proxy;
 
 import com.rpcdemo.netty.client.NettyClient;
 import com.rpcdemo.netty.dto.RpcRequest;
+import com.rpcdemo.utils.IDGenerator;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -15,7 +16,7 @@ public class DynamicProxy implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         System.out.println("before");
         NettyClient nettyClient = new NettyClient(addr, port);
-        RpcRequest rpcRequest = new RpcRequest(method.getDeclaringClass().getName()
+        RpcRequest rpcRequest = new RpcRequest(IDGenerator.getID(), method.getDeclaringClass().getName()
                 , method.getName(), args, method.getParameterTypes());
         nettyClient.sendMessage(rpcRequest);
         System.out.println("after");

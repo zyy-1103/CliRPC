@@ -1,5 +1,7 @@
 package com.rpcdemo.netty.client;
 
+import com.rpcdemo.common.Protocol;
+import com.rpcdemo.netty.dto.RpcMessage;
 import com.rpcdemo.netty.dto.RpcRequest;
 import com.rpcdemo.netty.serialize.KryoSerializer;
 import com.rpcdemo.server.TimeClientDecode;
@@ -35,10 +37,13 @@ public class NettyClient {
 
     public void sendMessage(RpcRequest rpcRequest) throws InterruptedException {
 
-        ByteBuf buf = Unpooled.buffer();
-        buf.writeInt(KryoSerializer.REQUEST);
-        buf.writeBytes(KryoSerializer.serialize(rpcRequest));
-        ChannelFuture future = channel.writeAndFlush(buf);
+        RpcMessage rpcMessage = new RpcMessage(Protocol.REQUEST_TYPE, rpcRequest);
+        ChannelFuture future = channel.writeAndFlush(rpcMessage);
+
+//        ByteBuf buf = Unpooled.buffer();
+//        buf.writeBytes(KryoSerializer.serialize(rpcRequest));
+//        ChannelFuture future = channel.writeAndFlush(buf);
+
         future.addListener((ChannelFuture cf) -> {
             if (cf.isSuccess()) {
                 System.out.println("Data sent successfully");

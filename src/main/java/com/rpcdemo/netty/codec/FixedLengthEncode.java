@@ -11,12 +11,10 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FixedLengthEncode extends MessageToByteEncoder<RpcMessage> {
-    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(0);
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, RpcMessage rpcMessage, ByteBuf byteBuf) throws Exception {
         byte[] serialize = KryoSerializer.serialize(rpcMessage.getData());
         byteBuf.writeByte(rpcMessage.getType());
-        byteBuf.writeInt(rpcMessage.getID());
         byteBuf.writeInt(serialize.length + Protocol.HEAD_SIZE);
         byteBuf.writeBytes(serialize);
     }
