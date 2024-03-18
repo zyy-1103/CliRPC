@@ -12,10 +12,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Properties;
 
 public class NettyClient {
     EventLoopGroup worker;
@@ -30,7 +26,7 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(new TimeClientDecode(), new TimeClientHandler());
+//                        socketChannel.pipeline().addLast(1);
                     }
                 });
         ChannelFuture connect = bootstrap.connect(addr, port);
@@ -42,6 +38,15 @@ public class NettyClient {
         ByteBuf buf = Unpooled.buffer();
         buf.writeInt(KryoSerializer.REQUEST);
         buf.writeBytes(KryoSerializer.serialize(rpcRequest));
+        ChannelFuture future = channel.writeAndFlush(buf);
+        future.addListener((ChannelFuture cf) -> {
+            if (cf.isSuccess()) {
+                System.out.println("Data sent successfully");
+            } else {
+                System.out.println("Failed to send data");
+                cf.cause().printStackTrace();
+            }
+        });
         channel.closeFuture().sync();
 
 
