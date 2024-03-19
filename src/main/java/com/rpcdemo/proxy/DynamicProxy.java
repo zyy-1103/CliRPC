@@ -7,10 +7,13 @@ import com.rpcdemo.utils.IDGenerator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DynamicProxy implements InvocationHandler {
     final String addr = "127.0.0.1";
     final int port = 8080;
+    private static ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -25,6 +28,7 @@ public class DynamicProxy implements InvocationHandler {
 
     public <T> T getProxy(String interfaceName) throws ClassNotFoundException {
         Class<?> aClass = Class.forName(interfaceName);
-        return (T) Proxy.newProxyInstance(aClass.getClassLoader(), aClass.getInterfaces(), this);
+        return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), aClass.getInterfaces(), this);
+//        return (T) Proxy.newProxyInstance(aClass.getClassLoader(), aClass.getInterfaces(), this);
     }
 }

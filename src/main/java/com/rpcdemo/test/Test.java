@@ -18,11 +18,7 @@ public class Test {
     }
 
     public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        RpcResponse<String> rpcResponse = new RpcResponse<>();
-        rpcResponse.setData("abc");
-        byte[] serialize = KryoSerializer.serialize(rpcResponse);
-        RpcResponse deserialize = KryoSerializer.deserialize(serialize, RpcResponse.class);
-        System.out.println(deserialize.getData());
+
 
     }
 }
