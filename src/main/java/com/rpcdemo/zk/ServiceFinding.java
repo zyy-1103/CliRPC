@@ -14,7 +14,7 @@ public class ServiceFinding {
     private CuratorFramework client;
 
     public String findingService(String serviceName, LoadBalance balance) throws Exception {
-        List<String> strings = client.getChildren().forPath(serviceName);
+        List<String> strings = client.getChildren().forPath(BASE_PATH+"/"+ serviceName);
         return balance.balance(strings);
     }
 }
